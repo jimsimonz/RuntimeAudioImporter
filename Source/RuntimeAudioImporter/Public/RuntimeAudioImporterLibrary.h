@@ -89,6 +89,10 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Keywords = "Importer, Transcoder, Converter, Runtime, MP3, FLAC, WAV, OGG, Vorbis"), Category = "Runtime Audio Importer|Import")
 	void ImportAudioFromFile(const FString& FilePath, EAudioFormat AudioFormat);
 
+
+	UFUNCTION(BlueprintCallable, meta = (Keywords = "Importer, Transcoder, Converter, Runtime, MP3, FLAC, WAV, OGG, Vorbis"), Category = "Runtime Audio Importer|Import")
+	USoundWave* ImportAudioFromFileSync(const FString& FilePath, EAudioFormat AudioFormat);
+
 	/**
 	 * Import audio file from the pre-imported sound asset
 	 *
@@ -105,6 +109,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, meta = (Keywords = "Importer, Transcoder, Converter, Runtime, MP3, FLAC, WAV, OGG, Vorbis"), Category = "Runtime Audio Importer|Import")
 	void ImportAudioFromBuffer(TArray<uint8> AudioData, EAudioFormat AudioFormat);
+
+	USoundWave* ImportAudioFromBufferSync(TArray<uint8> AudioData, EAudioFormat AudioFormat);
+	USoundWave* ImportAudioFromDecodedInfoSync(const FDecodedAudioStruct& DecodedAudioInfo);
 
 	/**
 	 * Import audio from RAW file. Audio data must not have headers and must be uncompressed

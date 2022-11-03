@@ -48,7 +48,7 @@ void UImportedSoundWave::Parse(FAudioDevice* AudioDevice, const UPTRINT NodeWave
 
 		if (!bLooping)
 		{
-			AudioDevice->StopActiveSound(&ActiveSound);
+			AudioDevice->StopActiveSound(&ActiveSound,0,0);
 		}
 		else
 		{
@@ -162,7 +162,7 @@ bool UImportedSoundWave::IsPlaybackFinished()
 	return bOutOfFrames && bValidPCMData;
 }
 
-int32 UImportedSoundWave::OnGeneratePCMAudio(TArray<uint8>& OutAudio, int32 NumSamples)
+int32 UImportedSoundWave::OnGeneratePCMAudio(TArray<uint8>& OutAudio, int32 NumSamples, const int32 ClockPositionInFrames)
 {
 	TWeakObjectPtr<UImportedSoundWave> ThisPtr(this);
 

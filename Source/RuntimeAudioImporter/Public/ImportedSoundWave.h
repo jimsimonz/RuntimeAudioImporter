@@ -160,7 +160,7 @@ public:
 	 * @param NumSamples Required number of samples
 	 * @return Number of retrieved samples (usually equals to NumSamples)
 	 */
-	virtual int32 OnGeneratePCMAudio(TArray<uint8>& OutAudio, int32 NumSamples) override;
+	virtual int32 OnGeneratePCMAudio(TArray<uint8>& OutAudio, int32 NumSamples, const int32 ClockPositionInFrames) override;
 
 	/**
 	 * Getting the format of the retrieved PCM data

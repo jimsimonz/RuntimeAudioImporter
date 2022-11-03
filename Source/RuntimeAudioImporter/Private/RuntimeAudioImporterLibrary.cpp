@@ -67,6 +67,27 @@ void URuntimeAudioImporterLibrary::ImportAudioFromFile(const FString& FilePath, 
 		ThisPtr->ImportAudioFromBuffer(MoveTemp(AudioBuffer), AudioFormat);
 	});
 }
+USoundWave* URuntimeAudioImporterLibrary::ImportAudioFromFileSync(const FString& FilePath, EAudioFormat AudioFormat)
+{
+	// Checking if the file exists
+	if (!FPaths::FileExists(FilePath))
+	{
+		return nullptr;
+	}
+
+	// Getting the audio format
+	AudioFormat = AudioFormat == EAudioFormat::Auto ? GetAudioFormat(FilePath) : AudioFormat;
+	AudioFormat = AudioFormat == EAudioFormat::Invalid ? EAudioFormat::Auto : AudioFormat;
+
+	TArray<uint8> AudioBuffer;
+
+	// Filling AudioBuffer with a binary file
+	if (!LoadAudioFileToArray(AudioBuffer, *FilePath))
+	{
+		return nullptr;
+	}
+	return ImportAudioFromBufferSync(MoveTemp(AudioBuffer), AudioFormat);
+}
 
 void URuntimeAudioImporterLibrary::ImportAudioFromRAWFile(const FString& FilePath, ERAWAudioFormat RAWFormat, int32 SampleRate, int32 NumOfChannels)
 {
@@ -147,7 +168,35 @@ void URuntimeAudioImporterLibrary::ImportAudioFromPreImportedSound(UPreImportedS
 {
 	ImportAudioFromBuffer(PreImportedSoundAsset->AudioDataArray, PreImportedSoundAsset->AudioFormat);
 }
+USoundWave* URuntimeAudioImporterLibrary::ImportAudioFromBufferSync(TArray<uint8> AudioData, EAudioFormat AudioFormat)
+{
+	if (AudioFormat == EAudioFormat::Invalid)
+	{
+		UE_LOG(LogRuntimeAudioImporter, Error, TEXT("Undefined audio data format for import"));
+		return nullptr;
+	}
 
+	uint8* EncodedAudioDataPtr = static_cast<uint8*>(FMemory::Memcpy(FMemory::Malloc(AudioData.Num()), AudioData.GetData(), AudioData.Num()));
+
+	if (!EncodedAudioDataPtr)
+	{
+		UE_LOG(LogRuntimeAudioImporter, Error, TEXT("Failed to allocate memory for compressed audio data"));
+		return nullptr;
+	}
+
+	FEncodedAudioStruct EncodedAudioInfo(EncodedAudioDataPtr, AudioData.Num(), AudioFormat);
+
+	
+	FDecodedAudioStruct DecodedAudioInfo;
+	if (!DecodeAudioData(EncodedAudioInfo, DecodedAudioInfo))
+	{
+		return nullptr;
+	}
+
+	
+	// Finalizing import
+	return ImportAudioFromDecodedInfoSync(DecodedAudioInfo);
+}
 void URuntimeAudioImporterLibrary::ImportAudioFromBuffer(TArray<uint8> AudioData, EAudioFormat AudioFormat)
 {
 	TWeakObjectPtr<URuntimeAudioImporterLibrary> ThisPtr(this);
@@ -436,6 +485,21 @@ void URuntimeAudioImporterLibrary::ImportAudioFromDecodedInfo(const FDecodedAudi
 	UE_LOG(LogRuntimeAudioImporter, Log, TEXT("The audio data was successfully imported. Information about imported data:\n%s"), *DecodedAudioInfo.ToString());
 	OnProgress_Internal(100);
 	OnResult_Internal(ImportedSoundWave, ETranscodingStatus::SuccessfulImport);
+}
+USoundWave* URuntimeAudioImporterLibrary::ImportAudioFromDecodedInfoSync(const FDecodedAudioStruct& DecodedAudioInfo)
+{
+	UImportedSoundWave* ImportedSoundWave = CreateImportedSoundWave();
+
+	if (!ImportedSoundWave)
+	{
+		UE_LOG(LogRuntimeAudioImporter, Error, TEXT("Something went wrong while creating the imported sound wave"));
+		return nullptr;
+	}
+
+	DefineSoundWave(ImportedSoundWave, DecodedAudioInfo);
+
+	UE_LOG(LogRuntimeAudioImporter, Log, TEXT("The audio data was successfully imported. Information about imported data:\n%s"), *DecodedAudioInfo.ToString());
+	return ImportedSoundWave;
 }
 
 void URuntimeAudioImporterLibrary::DefineSoundWave(UImportedSoundWave* ImportedSoundWave, const FDecodedAudioStruct& DecodedAudioInfo)
