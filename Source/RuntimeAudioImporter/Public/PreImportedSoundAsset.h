@@ -1,4 +1,4 @@
-// Georgy Treshchev 2022.
+// Georgy Treshchev 2024.
 
 #pragma once
 
@@ -23,7 +23,7 @@ public:
 
 	/** Audio data format */
 	UPROPERTY(Category = "Info", VisibleAnywhere, Meta = (DisplayName = "Audio format"))
-	EAudioFormat AudioFormat;
+	ERuntimeAudioFormat AudioFormat;
 
 	/** Information about the basic details of an audio file. Used only for convenience in the editor */
 #if WITH_EDITORONLY_DATA

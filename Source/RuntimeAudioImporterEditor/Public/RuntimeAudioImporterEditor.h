@@ -1,8 +1,10 @@
-// Georgy Treshchev 2022.
+// Georgy Treshchev 2024.
 
 #pragma once
 
 #include "Modules/ModuleManager.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogRuntimeAudioImporterEditor, Log, All);
 
 class FRuntimeAudioImporterEditorModule : public IModuleInterface
 {

@@ -1,4 +1,4 @@
-﻿// Georgy Treshchev 2022.
+﻿// Georgy Treshchev 2024.
 
 #pragma once
 
@@ -8,22 +8,33 @@
 #include "Logging/LogMacros.h"
 #include "Logging/LogVerbosity.h"
 
+#include "Misc/EngineVersionComparison.h"
+#include "Misc/FileHelper.h"
+
 DECLARE_LOG_CATEGORY_EXTERN(LogRuntimeAudioImporter, Log, All);
 
-namespace RuntimeAudioImporter_TranscoderLogs
+namespace RuntimeAudioImporter
 {
-	static void PrintLog(const FString& LogString)
-	{
-		UE_LOG(LogRuntimeAudioImporter, Log, TEXT("%s"), *LogString);
-	}
-	
-	static void PrintWarning(const FString& WarningString)
-	{
-		UE_LOG(LogRuntimeAudioImporter, Warning, TEXT("%s"), *WarningString);
-	}
+#if WITH_RUNTIMEAUDIOIMPORTER_FILEOPERATION_SUPPORT
+	/**
+	 * Check and request permissions required for audio importing/exporting
+	 * @param AllRequiredPermissions List of all required permissions. If no permissions are provided, only those necessary for the RuntimeAudioImporter will be requested
+	 */
+	RUNTIMEAUDIOIMPORTER_API bool CheckAndRequestPermissions(TArray<FString> AllRequiredPermissions = TArray<FString>());
 
-	static void PrintError(const FString& ErrorString)
+	/**
+	 * Load audio file to TArray64<uint8>
+	 */
+	RUNTIMEAUDIOIMPORTER_API bool LoadAudioFileToArray(TArray64<uint8>& AudioData, const FString& FilePath);
+
+	/**
+	 * Save audio file from array (Perfect forwarding to FFileHelper::SaveArrayToFile)
+	 */
+	template<typename T>
+	static bool SaveAudioFileFromArray(T&& AudioData, const FString& FilePath)
 	{
-		UE_LOG(LogRuntimeAudioImporter, Error, TEXT("%s"), *ErrorString);
+		CheckAndRequestPermissions();
+		return FFileHelper::SaveArrayToFile(Forward<T>(AudioData), *FilePath);
 	}
+#endif
 }
