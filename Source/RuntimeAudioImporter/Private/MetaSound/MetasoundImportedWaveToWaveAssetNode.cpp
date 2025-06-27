@@ -13,6 +13,7 @@
 #include "MetasoundStandardNodesCategories.h"
 #include "MetasoundDataTypeRegistrationMacro.h"
 #include "MetasoundVertex.h"
+#include "MetasoundNodeInterface.h"
 #include "MetaSound/MetasoundImportedWave.h"
 
 #define LOCTEXT_NAMESPACE "MetasoundImportedWaveToWaveAsset"
@@ -152,6 +153,14 @@ namespace RuntimeAudioImporter
 		FImportedWaveToWaveAssetNode(const Metasound::FNodeInitData& InInitData)
 			: FNodeFacade(InInitData.InstanceName, InInitData.InstanceID, Metasound::TFacadeOperatorClass<FImportedWaveToWaveAssetNodeOperator>())
 		{
+		}
+		FImportedWaveToWaveAssetNode(Metasound::FNodeData InNodeData, TSharedRef<const Metasound::FNodeClassMetadata> InClassMetadata)
+			: FNodeFacade(MoveTemp(InNodeData), MoveTemp(InClassMetadata), Metasound::TFacadeOperatorClass<FImportedWaveToWaveAssetNodeOperator>())
+		{
+		}
+		static Metasound::FNodeClassMetadata CreateNodeClassMetadata()
+		{
+			return FImportedWaveToWaveAssetNodeOperator::GetNodeInfo();
 		}
 	};
 
