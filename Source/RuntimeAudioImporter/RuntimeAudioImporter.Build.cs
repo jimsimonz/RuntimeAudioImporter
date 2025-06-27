@@ -30,8 +30,8 @@ public class RuntimeAudioImporter : ModuleRules
 		bool bUseDrMp3 = false;
 
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		AddEngineThirdPartyPrivateStaticDependencies(Target,
+        //OptimizeCode = CodeOptimization.Never;
+        AddEngineThirdPartyPrivateStaticDependencies(Target,
 			"UEOgg",
 			"Vorbis",
 			"libOpus"
@@ -107,7 +107,7 @@ public class RuntimeAudioImporter : ModuleRules
 					"MetasoundEngine",
 					"MetasoundFrontend",
 					"MetasoundGraphCore",
-					"MetaSoundEditor",
+					"MetaSoundEditor"
                 }
 			);
 		}
